@@ -1,0 +1,233 @@
+/** @OnlyCurrentDoc */
+var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+function cadastrarRegistroDeVoo(){
+
+  //capturar os dados
+  var matricula = ss.getRange('F7');//0
+  var esforcoAereo = ss.getRange('F9');//1
+  var ordemDeMissao = ss.getRange('L7');//2
+  var quadrinho = ss.getRange('L9');//3
+  var dataHoraDep = ss.getRange('F15');//4
+  var tempoVoo = ss.getRange('F17');//5
+  var localDep = ss.getRange('F19');//6
+  var localArr = ss.getRange('F21');//7
+  var trip1P = ss.getRange('L15');//8
+  var trip2P = ss.getRange('L17');//9
+  var tripMec1 = ss.getRange('L19');//10
+  var tripMec2 = ss.getRange('L21');//11
+  var observacoes = ss.getRange('F31');//12
+
+  var campos = [matricula, esforcoAereo, ordemDeMissao, quadrinho, dataHoraDep,tempoVoo,localDep,localArr,trip1P,trip2P,tripMec1,tripMec2,observacoes];
+  
+  //validar os dados
+  //var listaDadosObrigatorios = [matricula, dataHoraDep, tempoVoo];
+  var listaDadosObrigatorios = [];
+
+  if(!validarDadosObrigatorio(listaDadosObrigatorios)){
+    SpreadsheetApp.getUi().alert("ERRO: Faltam dados obrigatórios!");
+    return;
+  }
+
+  //tratar os dados
+
+  //gravar novo registro
+  gravar(campos);
+
+  //limpar campos
+  SpreadsheetApp.getUi().alert("DEU CERTO!");
+  limparCampos(campos);
+
+}
+
+function showAlert(texto) {
+  SpreadsheetApp.getUi().alert(texto);
+}
+
+function mes(data){    
+    return (new Date(data).getMonth()+1); //+1 pois no getMonth Janeiro começa com zero.
+}
+
+function gravar(campos) {
+  var op = ss.getSheetByName('OP');
+  var idRegistro = op.getLastRow()+1;
+  
+  var posicao = 1;
+
+  var dataHoraDepDate = new Date(campos[4].getValue());
+  var a = Utilities.formatDate(dataHoraDepDate, "GMT", "dd/MM/yyyy HH:mm");
+  op.getRange(idRegistro, posicao).setValue(a);
+  
+  posicao++;
+  var b = (a == "") ? "" : dataHoraDepDate.getMonth()+1;
+  op.getRange(idRegistro, posicao).setValue(b);
+
+  posicao++;
+  //var c
+  op.getRange(idRegistro, posicao).setFormula("=VLOOKUP($D"+idRegistro+";AERONAVES!$A$2:$B$97;2;FALSE)");
+
+  posicao++;
+  var d = campos[0].getValue();
+  op.getRange(idRegistro, posicao).setValue(d);
+
+  posicao++;
+  var e = campos[2].getValue();
+  op.getRange(idRegistro, posicao).setValue(e);
+
+  posicao++;
+  var f = campos[8].getValue();
+  op.getRange(idRegistro, posicao).setValue(f);
+  
+  posicao++;
+  var g = campos[9].getValue();
+  op.getRange(idRegistro, posicao).setValue(g);
+  
+  posicao++;
+  //var h
+  op.getRange(idRegistro, posicao).setFormula("=CONCATENATE($F"+idRegistro+"; \" \"; $G"+idRegistro+")");
+  
+  posicao++;
+  var i = campos[10].getValue();
+  op.getRange(idRegistro, posicao).setValue(i);
+  
+  posicao++;
+  var j = campos[11].getValue();
+  op.getRange(idRegistro, posicao).setValue(j);
+  
+  posicao++;
+  //var k
+
+  posicao++;
+  //var l
+
+  posicao++;
+  var m = campos[5].getValue();
+  op.getRange(idRegistro, posicao).setValue(m);
+
+  posicao++;
+  var n = campos[1].getValue();
+  op.getRange(idRegistro, posicao).setValue(n);
+
+  posicao++;
+  var o = campos[6].getValue();
+  op.getRange(idRegistro, posicao).setValue(o);
+
+  posicao++;
+  var p = campos[7].getValue();
+  op.getRange(idRegistro, posicao).setValue(p);
+
+  // var q
+  // var r
+  // var s
+  // var t
+  // var u
+  var quad = campos[3].getValue();
+  switch(quad){
+    case "LOCAL":
+      posicao = 17;
+      op.getRange(idRegistro, posicao).setValue(1);
+      break;    
+    case "PRETO":
+      posicao = 18;
+      op.getRange(idRegistro, posicao).setValue(1);
+      break;
+    case "VERMELHO":
+      posicao = 19;
+      op.getRange(idRegistro, posicao).setValue(1);
+      break;
+    case "PERNOITE":
+      posicao = 20;
+      op.getRange(idRegistro, posicao).setValue(1);
+      break;
+    case "SOBREAVISO":
+      posicao = 21;
+      op.getRange(idRegistro, posicao).setValue(1);
+      break;
+
+    case "LOCAL(NÃO CONTAR)":
+      posicao = 17;
+      op.getRange(idRegistro, posicao).setValue(0);
+      break;    
+    case "PRETO(NÃO CONTAR)":
+      posicao = 16;
+      op.getRange(idRegistro, posicao).setValue(0);
+      break;
+    case "VERMELHO(NÃO CONTAR)":
+      posicao = 17;
+      op.getRange(idRegistro, posicao).setValue(0);
+      break;
+    case "PERNOITE(NÃO CONTAR)":
+      posicao = 18;
+      op.getRange(idRegistro, posicao).setValue(0);
+      break;
+    case "SOBREAVISO(NÃO CONTAR)":
+      posicao = 19;
+      op.getRange(idRegistro, posicao).setValue(0);
+      break;
+  }
+  
+  posicao = 22;
+  var v = campos[12].getValue();
+  op.getRange(idRegistro, posicao).setValue(v);
+
+
+
+/*
+  var lista = [a,b,c,d];
+
+  for(var i = 0; i < lista.length; i++) {
+    op.getRange(idRegistro, i+1).setValue(lista[i]);  
+  }  
+*/
+
+}
+
+
+function limparCampos(campos){
+  //campos.forEach((campo) => {campo.setValue("")});
+}
+
+function validarDadosObrigatorio(lista){
+
+  //lista.forEach((campo) => {
+  //  if(campo.getValue() == "") return false;
+  //});
+  for(var i = 0; i < lista.length; i++){
+    if(lista[i].getValue() == "") return false;
+  }
+  return true;
+
+}
+
+function Registro_de_Voo() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('F7').activate();
+  spreadsheet.setActiveSheet(spreadsheet.getSheetByName('Página11'), true);
+  spreadsheet.getRange('A2').activate();
+  spreadsheet.getRange('REGISTRO_DE_VOO!F7').copyTo(spreadsheet.getActiveRange(), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
+  spreadsheet.setActiveSheet(spreadsheet.getSheetByName('REGISTRO_DE_VOO'), true);
+  spreadsheet.getRange('F9').activate();
+  spreadsheet.setActiveSheet(spreadsheet.getSheetByName('Página11'), true);
+  spreadsheet.getRange('B2').activate();
+  spreadsheet.getRange('REGISTRO_DE_VOO!F9').copyTo(spreadsheet.getActiveRange(), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
+  spreadsheet.setActiveSheet(spreadsheet.getSheetByName('REGISTRO_DE_VOO'), true);
+  spreadsheet.getRange('F11').activate();
+  spreadsheet.setActiveSheet(spreadsheet.getSheetByName('Página11'), true);
+  spreadsheet.getRange('C2').activate();
+  spreadsheet.getRange('REGISTRO_DE_VOO!F11').copyTo(spreadsheet.getActiveRange(), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
+  spreadsheet.setActiveSheet(spreadsheet.getSheetByName('REGISTRO_DE_VOO'), true);
+  spreadsheet.getRange('F13').activate();
+  spreadsheet.setActiveSheet(spreadsheet.getSheetByName('Página11'), true);
+  spreadsheet.getRange('D2').activate();
+  spreadsheet.getRange('REGISTRO_DE_VOO!F13').copyTo(spreadsheet.getActiveRange(), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
+  spreadsheet.setActiveSheet(spreadsheet.getSheetByName('REGISTRO_DE_VOO'), true);
+  spreadsheet.getRange('F15').activate();
+  spreadsheet.setActiveSheet(spreadsheet.getSheetByName('Página11'), true);
+  spreadsheet.getRange('E2').activate();
+  spreadsheet.getRange('REGISTRO_DE_VOO!F15').copyTo(spreadsheet.getActiveRange(), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
+  spreadsheet.setActiveSheet(spreadsheet.getSheetByName('REGISTRO_DE_VOO'), true);
+  spreadsheet.getRange('F17').activate();
+  spreadsheet.setActiveSheet(spreadsheet.getSheetByName('Página11'), true);
+  spreadsheet.getRange('F2').activate();
+  spreadsheet.getRange('REGISTRO_DE_VOO!F17').copyTo(spreadsheet.getActiveRange(), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
+};
