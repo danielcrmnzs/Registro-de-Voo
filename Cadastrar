@@ -48,9 +48,44 @@ function mes(data){
     return (new Date(data).getMonth()+1); //+1 pois no getMonth Janeiro começa com zero.
 }
 
+function buscarModelo(matricula, dataReferencia = new Date()) {
+  dataReferencia = new Date(dataReferencia);
+  var planilha_aeronaves = ss.getSheetByName("AERONAVES");
+  var ultimo = planilha_aeronaves.getLastRow();
+  var result = planilha_aeronaves.getRange(2, 1, ultimo-1).getValues();
+  
+  var row = 0;
+
+  for(var i = 0; i < result.length; i++){
+    if (matricula == result[i]) {
+      row = i + 2; 
+    }
+  }
+
+  if (row == 0) return "ERRO: ANV Ñ ENCONTRADA!"
+
+  var indexColumnModelo = 3;
+  result = planilha_aeronaves.getRange(row, indexColumnModelo).getValue();
+
+  var indexColumnDataModernizacao = 4
+  var dataModern = planilha_aeronaves.getRange(row, indexColumnDataModernizacao).getValue();
+  
+  if(dataModern != "" && dataReferencia > dataModern){
+    return result + "M";
+  } else {
+    return result;
+  }
+  
+}
+
+function teste(){
+  console.log(buscarModelo(1000));
+}
+
 function gravar(campos) {
   var op = ss.getSheetByName('OP');
   var idRegistro = op.getLastRow()+1;
+  //var idRegistro = 1500;
   
   var posicao = 1;
 
@@ -58,61 +93,61 @@ function gravar(campos) {
   var a = Utilities.formatDate(dataHoraDepDate, "GMT", "dd/MM/yyyy HH:mm");
   op.getRange(idRegistro, posicao).setValue(a);
   
-  posicao++;
+  posicao = 2;
   var b = (a == "") ? "" : dataHoraDepDate.getMonth()+1;
   op.getRange(idRegistro, posicao).setValue(b);
 
-  posicao++;
+  posicao = 3;
   //var c
   op.getRange(idRegistro, posicao).setFormula("=VLOOKUP($D"+idRegistro+";AERONAVES!$A$2:$B$97;2;FALSE)");
 
-  posicao++;
+  posicao = 4;
   var d = campos[0].getValue();
   op.getRange(idRegistro, posicao).setValue(d);
 
-  posicao++;
+  posicao = 5 ;
   var e = campos[2].getValue();
   op.getRange(idRegistro, posicao).setValue(e);
 
-  posicao++;
+  posicao = 6;
   var f = campos[8].getValue();
   op.getRange(idRegistro, posicao).setValue(f);
   
-  posicao++;
+  posicao = 7;
   var g = campos[9].getValue();
   op.getRange(idRegistro, posicao).setValue(g);
   
-  posicao++;
+  posicao = 8;
   //var h
   op.getRange(idRegistro, posicao).setFormula("=CONCATENATE($F"+idRegistro+"; \" \"; $G"+idRegistro+")");
   
-  posicao++;
+  posicao = 9;
   var i = campos[10].getValue();
   op.getRange(idRegistro, posicao).setValue(i);
   
-  posicao++;
+  posicao = 10;
   var j = campos[11].getValue();
   op.getRange(idRegistro, posicao).setValue(j);
   
-  posicao++;
+  posicao = 11;
   //var k
 
-  posicao++;
+  posicao = 12;
   //var l
 
-  posicao++;
+  posicao = 13;
   var m = campos[5].getValue();
   op.getRange(idRegistro, posicao).setValue(m);
 
-  posicao++;
+  posicao = 14;
   var n = campos[1].getValue();
   op.getRange(idRegistro, posicao).setValue(n);
 
-  posicao++;
+  posicao = 15;
   var o = campos[6].getValue();
   op.getRange(idRegistro, posicao).setValue(o);
 
-  posicao++;
+  posicao = 16;
   var p = campos[7].getValue();
   op.getRange(idRegistro, posicao).setValue(p);
 
@@ -149,19 +184,19 @@ function gravar(campos) {
       op.getRange(idRegistro, posicao).setValue(0);
       break;    
     case "PRETO(NÃO CONTAR)":
-      posicao = 16;
-      op.getRange(idRegistro, posicao).setValue(0);
-      break;
-    case "VERMELHO(NÃO CONTAR)":
-      posicao = 17;
-      op.getRange(idRegistro, posicao).setValue(0);
-      break;
-    case "PERNOITE(NÃO CONTAR)":
       posicao = 18;
       op.getRange(idRegistro, posicao).setValue(0);
       break;
-    case "SOBREAVISO(NÃO CONTAR)":
+    case "VERMELHO(NÃO CONTAR)":
       posicao = 19;
+      op.getRange(idRegistro, posicao).setValue(0);
+      break;
+    case "PERNOITE(NÃO CONTAR)":
+      posicao = 20;
+      op.getRange(idRegistro, posicao).setValue(0);
+      break;
+    case "SOBREAVISO(NÃO CONTAR)":
+      posicao = 21;
       op.getRange(idRegistro, posicao).setValue(0);
       break;
   }
